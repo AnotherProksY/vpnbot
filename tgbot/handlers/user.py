@@ -7,8 +7,7 @@ from tgbot.keyboards.inline import keyboard_start, keyboard_help
 
 async def user_start(message: Message):
     await message.answer('Привет, я помогу тебе с VPN\n\n'
-                         'Исходный код бота - <a href="https://github.com/bl4ckm45k/vpnbot">GitHub</a>\n'
-                         'Здесь прячется человек - <a href="https://t.me/pay4fallwall">Telegram</a>',
+                         'Техническая поддержка - <a href="https://t.me/vpnbot_support">Telegram</a>',
                          reply_markup=keyboard_start(), disable_web_page_preview=True)
 
 

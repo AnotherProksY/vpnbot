@@ -19,7 +19,7 @@ def keyboard_start():
 def keyboard_help():
     keyboard = InlineKeyboardMarkup()
     btn_vpn_client = InlineKeyboardButton(f'Клиент Outline VPN',
-                                          url=f'https://getoutline.org/ru/get-started/')
+                                          url=f'https://getoutline.org/en-GB/get-started/#step-3')
     keyboard.row(btn_vpn_client)
     return keyboard
 
