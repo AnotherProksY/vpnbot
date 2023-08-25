@@ -34,6 +34,8 @@ async def on_startup(dispatcher):
     db_pool = await db.create_pool()
     if db_pool:
         await db.create_servers_table()
+        await db.create_users_table()
+        await db.create_users_keys_table()
         register_all_filters(dispatcher)
         register_all_handlers(dispatcher)
         # If you use polling

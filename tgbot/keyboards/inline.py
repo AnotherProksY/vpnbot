@@ -10,16 +10,16 @@ logger = logging.getLogger(__name__)
 
 def keyboard_start():
     keyboard = InlineKeyboardMarkup()
-    inline_btn_1 = InlineKeyboardButton(f'Доступ к VPN',
+    inline_btn_1 = InlineKeyboardButton(f'Подключить VPN',
                                         callback_data=vpn_callback.new(action_type='vpn_settings', server='no'))
-    inline_btn_2 = InlineKeyboardButton(f'Что за VPN?', callback_data='why')
+    inline_btn_2 = InlineKeyboardButton(f'Что такое VPN?', callback_data='why')
     return keyboard.row(inline_btn_1, inline_btn_2)
 
 
-def keyboard_help():
+def keyboard_install():
     keyboard = InlineKeyboardMarkup()
-    btn_vpn_client = InlineKeyboardButton(f'Клиент Outline VPN',
-                                          url=f'https://getoutline.org/en-GB/get-started/#step-3')
+    btn_vpn_client = InlineKeyboardButton(f'Установить Outline себе на устройство',
+                                          url=f'https://getoutline.org/ru/get-started/#step-3')
     keyboard.row(btn_vpn_client)
     return keyboard
 

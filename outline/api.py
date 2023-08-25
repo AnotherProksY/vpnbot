@@ -1,3 +1,5 @@
+# Outline Manager HTTP API: https://redocly.github.io/redoc/?url=https://raw.githubusercontent.com/Jigsaw-Code/outline-server/master/src/shadowbox/server/api.yml
+
 import logging
 from http import HTTPStatus
 

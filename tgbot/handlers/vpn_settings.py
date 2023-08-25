@@ -7,7 +7,7 @@ from aiohttp import ClientConnectorError
 
 from loader import db, bot, outline
 from tgbot.keyboards.callback_data_factory import vpn_callback
-from tgbot.keyboards.inline import keyboard_servers_list
+from tgbot.keyboards.inline import keyboard_servers_list, keyboard_install
 
 
 async def vpn_handler(message: Message):
@@ -23,12 +23,22 @@ async def vpn_callback_handler(callback_query: CallbackQuery):
 async def get_new_key(callback_query: CallbackQuery, callback_data: Dict[str, str]):
     await bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)
     try:
-        data = await outline.create_key(await db.get_server_key(int(callback_data['server'])))
-        await bot.send_message(callback_query.from_user.id,
-                               f'Вставьте вашу ссылку доступа в приложение Outline:')
-        await bot.send_message(callback_query.from_user.id,
-                               f'{data["accessUrl"]}')
-        await callback_query.answer()
+        keys = await db.get_user_keys(callback_query.from_user.id)
+        if not keys or len(keys) < 2:
+            data = await outline.create_key(await db.get_server_key(int(callback_data['server'])))
+            await db.add_user_key(callback_query.from_user.id, data["accessUrl"])
+            await bot.send_message(callback_query.from_user.id,
+                                f'Вставьте вашу ссылку доступа в приложение Outline:', reply_markup=keyboard_install())
+            await bot.send_message(callback_query.from_user.id,
+                                f'<code>{data["accessUrl"]}</code>')
+            await callback_query.answer()
+        else:
+            await bot.send_message(callback_query.from_user.id,
+                                f'Мы не можем создать вам новый ключ, так как у вас превышен максимальный лимит: 2\n\nРанее созданные ключи:')
+            for key in keys:
+                await bot.send_message(callback_query.from_user.id,
+                                    f'<code>{key[0]}</code>')
+            await callback_query.answer()
     except ClientConnectorError:
         await bot.send_message(callback_query.from_user.id,
                                f'Не удалось связаться с сервером для получения ключа, попробуйте через какое-то время')

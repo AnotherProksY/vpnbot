@@ -1,34 +1,55 @@
 from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery, ChatType
 
-from loader import bot
-from tgbot.keyboards.inline import keyboard_start, keyboard_help
+from loader import bot, db
+from tgbot.keyboards.inline import keyboard_start
 
 
 async def user_start(message: Message):
-    await message.answer('Привет, я помогу тебе с VPN\n\n'
-                         'Техническая поддержка - <a href="https://t.me/vpnbot_support">Telegram</a>',
+    await db.add_user(message.from_user.id, message.from_user.username)
+    await message.answer(f'Привет, @{message.from_user.username} 👋\n\n'
+                         'Мы поможем тебе подключить твой личный <b>VPN</b> без рекламы и на огромных скоростях всего за пару кликов!\n\n'
+                         'В случае возникноваения каких-либо проблем, ты всегда можешь обратиться в нашу техническую поддержку: <a href="https://t.me/vpnbot_support">отправить сообщение</a>',
                          reply_markup=keyboard_start(), disable_web_page_preview=True)
 
 
 async def help_handler(message: Message):
-    await message.answer(f'Outline – это ПО с открытым исходным кодом, '
+    await message.answer(f'Преимущества <b>VPN</b>\n\n'
+                         f'<b>VPN</b> позволяет безопасно обмениваться данными и '
+                         f'пользоваться интернетом в обход цензуры. Это особенно '
+                         f'актуально в текущее время, когда власти пытаются '
+                         f'<b>заблокировать</b> внешние ресурсы и технологии VPN.\n\n'
+                         f'Мы используем технологию <b>Outline</b>!\n\n'
+                         f'<b>Outline</b> не подведет, когда другие VPN откажут: наш сервис '
+                         f'не так просто отследить и заблокировать на основе сетей или IP-адресов.\n\n'
+                         f'Решение <b>Outline</b> надежнее, поскольку работает на основе протокола, который '
+                         f'сложно обнаружить, а следовательно – заблокировать.\n\n'
+                         f'<b>Outline</b> - это ПО с открытым исходным кодом, '
                          f'которое прошло проверку организаций '
                          f'<a href="https://s3.amazonaws.com/outline-vpn/static_downloads/ros-report.pdf">Radically Open Security</a> и '
                          f'<a href="https://s3.amazonaws.com/outline-vpn/static_downloads/cure53-report.pdf">Cure53</a>.\n\n'
-                         f'Outline использует технологии <a href="https://shadowsocks.org/">Shadowsocks</a>',
-                         reply_markup=keyboard_help(), disable_web_page_preview=True)
+                         f'<b>Outline</b> использует технологию <a href="https://shadowsocks.org/">Shadowsocks</a>',disable_web_page_preview=True)
 
 
 async def help_callback_handler(callback_query: CallbackQuery):
     await callback_query.answer()
     await bot.send_message(callback_query.from_user.id,
-                           f'Outline – это ПО с открытым исходным кодом, '
+                           f'Преимущества <b>VPN</b>\n\n'
+                           f'<b>VPN</b> позволяет безопасно обмениваться данными и '
+                           f'пользоваться интернетом в обход цензуры. Это особенно '
+                           f'актуально в текущее время, когда власти пытаются '
+                           f'<b>заблокировать</b> внешние ресурсы и технологии VPN.\n\n'
+                           f'Мы используем технологию <b>Outline</b>!\n\n'
+                           f'<b>Outline</b> не подведет, когда другие VPN откажут: наш сервис '
+                           f'не так просто отследить и заблокировать на основе сетей или IP-адресов.\n\n'
+                           f'Решение <b>Outline</b> надежнее, поскольку работает на основе протокола, который '
+                           f'сложно обнаружить, а следовательно – заблокировать.\n\n'
+                           f'<b>Outline</b> - это ПО с открытым исходным кодом, '
                            f'которое прошло проверку организаций '
                            f'<a href="https://s3.amazonaws.com/outline-vpn/static_downloads/ros-report.pdf">Radically Open Security</a> и '
                            f'<a href="https://s3.amazonaws.com/outline-vpn/static_downloads/cure53-report.pdf">Cure53</a>.\n\n'
-                           f'Outline использует технологии <a href="https://shadowsocks.org/">Shadowsocks</a>',
-                           reply_markup=keyboard_help(), disable_web_page_preview=True)
+                           f'<b>Outline</b> использует технологию <a href="https://shadowsocks.org/">Shadowsocks</a>',
+                           disable_web_page_preview=True)
 
 
 def register_user(dp: Dispatcher):

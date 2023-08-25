@@ -70,8 +70,27 @@ class Database:
         sql = "CREATE TABLE IF NOT EXISTS vpn_servers (" \
               "id bigserial PRIMARY KEY, " \
               "server_name VARCHAR(60) NOT NULL," \
-              "api_link VARCHAR(255) NOT NULL UNIQUE," \
+              "api_link VARCHAR(255) NOT NULL UNIQUE, " \
               "UNIQUE (api_link, server_name))"
+        return await self.execute(sql, execute=True)
+
+    async def create_users_table(self):
+        sql = "CREATE TABLE IF NOT EXISTS users (" \
+              "id bigserial PRIMARY KEY, " \
+              "user_id BIGINT NOT NULL UNIQUE, " \
+              "username VARCHAR(255) NOT NULL UNIQUE, " \
+              "is_banned BOOLEAN DEFAULT FALSE, " \
+              "subscription_end_date TIMESTAMP, " \
+              "UNIQUE (user_id, username))"
+        return await self.execute(sql, execute=True)
+
+    async def create_users_keys_table(self):
+        sql = "CREATE TABLE IF NOT EXISTS users_keys (" \
+              "id bigserial PRIMARY KEY, " \
+              "user_id BIGINT NOT NULL, " \
+              "vpn_key VARCHAR(255) UNIQUE, " \
+              "CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(user_id), " \
+              "UNIQUE (vpn_key))"
         return await self.execute(sql, execute=True)
 
     async def get_servers(self):
@@ -82,9 +101,21 @@ class Database:
         sql = "SELECT api_link FROM vpn_servers WHERE id=$1"
         return await self.execute(sql, server_id, fetchval=True)
 
+    async def get_user_keys(self, user_id):
+        sql = "SELECT vpn_key FROM users_keys WHERE user_id=$1"
+        return await self.execute(sql, user_id, fetch=True)
+
     async def add_server(self, server_name, api_link):
         sql = "INSERT INTO vpn_servers (server_name, api_link) VALUES ($1, $2)"
         return await self.execute(sql, server_name, api_link, execute=True)
+
+    async def add_user(self, user_id, username):
+        sql = "INSERT INTO users(user_id, username) VALUES ($1, $2) ON CONFLICT DO NOTHING"
+        return await self.execute(sql, user_id, username, execute=True)
+
+    async def add_user_key(self, user_id, vpn_key):
+        sql = "INSERT INTO users_keys (user_id, vpn_key) VALUES ($1, $2)"
+        return await self.execute(sql, user_id, vpn_key, execute=True)
 
     async def delete_server(self, server_id):
         sql = "DELETE FROM vpn_servers WHERE id=$1"
