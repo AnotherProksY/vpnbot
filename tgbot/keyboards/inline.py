@@ -38,8 +38,9 @@ def keyboard_admin_action():
     keyboard = InlineKeyboardMarkup(row_width=2)
     btn_add_server = InlineKeyboardButton(f'Добавить сервер', callback_data='add_server')
     btn_delete_server = InlineKeyboardButton(f'Удалить сервер', callback_data='delete_server')
+    btn_broadcast_message = InlineKeyboardButton(f'Создать уведомление', callback_data='broadcast')
     btn_cancel = InlineKeyboardButton(f'❌Выйти из меню', callback_data=f"cancel")
-    keyboard.add(btn_add_server, btn_delete_server, btn_cancel)
+    keyboard.add(btn_add_server, btn_delete_server, btn_broadcast_message, btn_cancel)
     return keyboard
 
 

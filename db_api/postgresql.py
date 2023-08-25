@@ -101,6 +101,10 @@ class Database:
         sql = "SELECT api_link FROM vpn_servers WHERE id=$1"
         return await self.execute(sql, server_id, fetchval=True)
 
+    async def get_users(self):
+        sql = "SELECT user_id FROM users"
+        return await self.execute(sql, fetch=True)
+
     async def get_user_keys(self, user_id):
         sql = "SELECT vpn_key FROM users_keys WHERE user_id=$1"
         return await self.execute(sql, user_id, fetch=True)

@@ -8,7 +8,7 @@ from aiogram.types import Message, ChatType, CallbackQuery
 from loader import dp, db
 from tgbot.keyboards.callback_data_factory import vpn_callback
 from tgbot.keyboards.inline import keyboard_admin_action, keyboard_servers_list, keyboard_cancel
-from tgbot.states.servers_add import AddServer
+from tgbot.states.servers_add import AddServer, BroadcastMessage
 
 
 async def admin_start(message: Message):
@@ -60,13 +60,76 @@ async def admin_delete_server(callback_query: CallbackQuery, callback_data: Dict
     await callback_query.answer()
 
 
+async def admin_broadcast_message(callback_query: CallbackQuery, state: FSMContext):
+    await dp.bot.delete_message(callback_query.message.chat.id, callback_query.message.message_id)
+    await dp.bot.send_message(callback_query.from_user.id, 'Введите текст, который будет отправлен всем пользователям бота.',
+                              reply_markup=keyboard_cancel())
+    await state.set_state(BroadcastMessage.br_message)
+    await callback_query.answer()
+
+
+async def admin_send_broadcast_message(message: Message, state: FSMContext):
+    notifaction_message = message.text.strip()
+    users = await db.get_users()
+    for user in users:
+        await dp.bot.send_message(user[0], notifaction_message)
+
+    await state.finish()
+
+
 def register_admin(dispatcher: Dispatcher):
-    dispatcher.register_message_handler(admin_start, commands=["admin"], chat_type=ChatType.PRIVATE, is_admin=True)
-    dispatcher.register_callback_query_handler(admin_add_server, lambda c: c.data and c.data == 'add_server',
-                                               chat_type=ChatType.PRIVATE, is_admin=True)
-    dispatcher.register_message_handler(admin_server_name, chat_type=ChatType.PRIVATE, is_admin=True, state=AddServer.server_name)
-    dispatcher.register_message_handler(admin_api_link, chat_type=ChatType.PRIVATE, is_admin=True,
-                                        state=AddServer.api_link)
-    dispatcher.register_callback_query_handler(admin_servers_to_delete, lambda c: c.data and c.data == 'delete_server',
-                                               chat_type=ChatType.PRIVATE, is_admin=True)
-    dispatcher.register_callback_query_handler(admin_delete_server, vpn_callback.filter(action_type='to_delete'), chat_type=ChatType.PRIVATE, is_admin=True)
+    dispatcher.register_message_handler(
+        admin_start,
+        commands=["admin"],
+        chat_type=ChatType.PRIVATE,
+        is_admin=True
+    )
+
+    dispatcher.register_callback_query_handler(
+        admin_add_server,
+        lambda c: c.data and c.data == 'add_server',
+        chat_type=ChatType.PRIVATE,
+        is_admin=True
+    )
+
+    dispatcher.register_message_handler(
+        admin_server_name,
+        chat_type=ChatType.PRIVATE,
+        is_admin=True,
+        state=AddServer.server_name
+    )
+
+    dispatcher.register_message_handler(
+        admin_api_link,
+        chat_type=ChatType.PRIVATE,
+        is_admin=True,
+        state=AddServer.api_link
+    )
+
+    dispatcher.register_message_handler(
+        admin_send_broadcast_message,
+        chat_type=ChatType.PRIVATE,
+        is_admin=True,
+        state=BroadcastMessage.br_message
+    )
+
+    dispatcher.register_callback_query_handler(
+        admin_servers_to_delete,
+        lambda c: c.data and c.data == 'delete_server',
+        chat_type=ChatType.PRIVATE,
+        is_admin=True
+    )
+
+    dispatcher.register_callback_query_handler(
+        admin_broadcast_message,
+        lambda c: c.data and c.data == 'broadcast',
+        chat_type=ChatType.PRIVATE,
+        is_admin=True
+    )
+
+    dispatcher.register_callback_query_handler(
+        admin_delete_server,
+        vpn_callback.filter(action_type='to_delete'),
+        chat_type=ChatType.PRIVATE,
+        is_admin=True
+    )
